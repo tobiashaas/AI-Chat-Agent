@@ -27,8 +27,8 @@ Dieses Repository enthält eine vollständige **Docker Compose** Konfiguration, 
 1. Repository klonen oder Dateien herunterladen  
 2. `.env.example` kopieren zu `.env` und alle sensiblen Daten (Passwörter, Keys) anpassen  
 3. Setup-Skript ausführbar machen und ausführen (optional): chmod +x setup.sh ./setup.sh
-4. Docker Compose starten: docker-compose up -d
-5. 5. Services öffnen:
+4. Docker Compose starten: `docker-compose up -d`
+5. Services öffnen:
 - n8n: http://localhost:5678  
 - Supabase Studio: http://localhost:3001  
 - Ollama API: http://localhost:11434  
@@ -47,9 +47,9 @@ Dieses Repository enthält eine vollständige **Docker Compose** Konfiguration, 
 ## Ollama Modelle installieren
 
 Um Ollama-Modelle zu nutzen, öffnen Sie ein Terminal im Ollama-Container:
-docker exec -it ollama bash
-ollama pull llama2
-ollama list
+`docker exec -it ollama bash`
+`ollama pull llama2`
+`ollama list`
 
 ---
 
@@ -65,11 +65,11 @@ ollama list
 ## Troubleshooting
 
 - Logs anschauen:  
-docker-compose logs -f
-docker-compose logs n8n
+`docker-compose logs -f`
+`docker-compose logs n8n`
 
 - Container Status prüfen:  
-docker-compose ps
+`docker-compose ps`
 
 - Netzwerk prüfen und Verbindungen sicherstellen  
 - Ports in `.env` anpassen, falls Konflikte auftreten  
