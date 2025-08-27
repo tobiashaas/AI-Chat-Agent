@@ -115,20 +115,22 @@ services:
       - ollama_data:/root/.ollama
     networks:
       - ai_network
-    # GPU support
+    # Dynamische Konfiguration basierend auf Umgebungsvariablen
     deploy:
       resources:
         limits:
-          memory: 8G
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    # Use hardware acceleration (CUDA or CPU features)
+          memory: ${OLLAMA_MEMORY_LIMIT:-8G}
+    # Hardware Acceleration Umgebungsvariablen werden je nach erkannter Hardware gesetzt
     environment:
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      # NVIDIA GPU Support
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-none}
+      - NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:-""}
+      # AMD GPU Support
+      - AMD_GPU=${AMD_GPU:-0}
+      - HSA_OVERRIDE_GFX_VERSION=${HSA_OVERRIDE_GFX_VERSION:-""}
+      # Apple Silicon Support
+      - DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH:-""}
+      - METAL_DEVICE_WRAPPER_TYPE=${METAL_DEVICE_WRAPPER_TYPE:-""}
     # Security enhancements
     security_opt:
       - no-new-privileges:true

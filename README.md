@@ -20,7 +20,7 @@ A complete Docker Compose configuration for a modern AI development environment.
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/username/AI-Chat-Agent.git
+git clone https://github.com/tobiashaas/AI-Chat-Agent.git
 cd AI-Chat-Agent
 ```
 
@@ -45,9 +45,27 @@ notepad .env  # Adjust passwords and keys!
 
 ### 4. Start Services
 
+**Option A: Standard-Start (ohne Hardware-Beschleunigung)**
+
 ```bash
-docker-compose up -d
+# Verwende docker compose (mit Leerzeichen) für Docker Compose V2
+docker compose up -d
 ```
+
+**Option B: Mit automatischer Hardware-Beschleunigung (empfohlen)**
+
+```bash
+# Auf Windows (PowerShell)
+.\start-with-acceleration.ps1
+
+# Auf Linux/macOS
+chmod +x ./start-with-acceleration.sh
+./start-with-acceleration.sh
+```
+
+Diese Methode erkennt automatisch deine GPU oder NPU und verwendet die optimale Konfiguration für dein System.
+
+> **Hinweis:** Wenn du alte Anleitungen oder Tutorials siehst, die `docker-compose` (mit Bindestrich) verwenden, ersetze diesen Befehl durch `docker compose` (mit Leerzeichen), da dies die neuere Version von Docker Compose ist (V2).
 
 ### 5. Access Services
 
@@ -59,20 +77,25 @@ docker-compose up -d
 ## 🛠️ Requirements
 
 - **Docker** (Version 20.10+)
-- **Docker Compose** (Version 2.0+)
+- **Docker Compose V2** (integriert in neueren Docker-Versionen)
 - **Minimum 8GB RAM**
-- **SSD recommended** for better performance
-- **GPU or AI accelerated CPU** (configured for better Ollama performance)
+- **SSD recommended** für bessere Performance
 
-## 🚀 Hardware Acceleration
+## 🚀 Hardware-Beschleunigung (neu!)
 
-This stack supports hardware acceleration for improved AI performance:
+Dieser Stack unterstützt verschiedene Hardware-Beschleunigungstechnologien für verbesserte KI-Performance:
 
-- **NVIDIA GPUs**: Automatically configured for LLM acceleration
-- **Intel/AMD CPUs**: Uses AVX2/AVX512 instructions when available
-- **Apple Silicon**: Optimized for M1/M2/M3 chips
+- **NVIDIA GPUs**: Automatisch konfiguriert mit CUDA für LLM-Beschleunigung
+- **AMD GPUs**: Unterstützt ROCm für Linux und DirectML für Windows
+- **Apple Silicon**: Optimiert für M1/M2/M3-Chips mit Metal Performance Shaders
+- **Intel NPUs**: Experimentelle Unterstützung für Intel Neural Processing Units
+- **Intel/AMD CPUs**: Nutzt AVX2/AVX512-Instruktionen wenn verfügbar
 
-See the [HARDWARE-ACCELERATION.md](HARDWARE-ACCELERATION.md) guide for detailed configuration options.
+### Automatische Erkennung und Konfiguration
+
+Die enthaltenen Skripte `start-with-acceleration.sh` (für Linux/macOS) und `start-with-acceleration.ps1` (für Windows) erkennen automatisch deine verfügbare Hardware und konfigurieren den Stack entsprechend.
+
+Detaillierte Konfigurationsoptionen und Informationen zur manuellen Einrichtung findest du in der [HARDWARE-ACCELERATION.md](HARDWARE-ACCELERATION.md).
 
 ## 💻 Cross-Platform Support
 
@@ -80,6 +103,7 @@ This stack has been designed to work across multiple operating systems:
 
 - **Windows**: Full PowerShell automation with `.ps1` scripts
 - **Linux**: Complete Bash script support with `.sh` scripts
+- **macOS**: Optimized for both Intel and Apple Silicon Macs
 - **macOS**: Full compatibility with the same Linux scripts
 
 All automation scripts are provided in both PowerShell and Bash versions to ensure a seamless experience regardless of your operating system.
@@ -136,31 +160,37 @@ All services run in the `ai_network` Docker network:
 
 ## 🤖 Installing Ollama Models
 
-After starting, you can use our model installer scripts:
+Nach dem Start kannst du unsere Modell-Installer-Skripte verwenden:
 
 ```bash
-# On Windows (PowerShell)
+# Auf Windows (PowerShell)
 .\install-models.ps1
 
-# On Linux/macOS
+# Auf Linux/macOS
 chmod +x ./install-models.sh
 ./install-models.sh
 ```
 
-You can also manually install models:
+Du kannst auch manuell Modelle installieren:
 
 ```bash
-# Download popular models
+# Beliebte Modelle herunterladen
 docker exec -it ollama ollama pull llama2
 docker exec -it ollama ollama pull mistral
 docker exec -it ollama ollama pull codellama
 
-# List available models
+# Verfügbare Modelle auflisten
 docker exec -it ollama ollama list
 
-# Interactive chat with a model
+# Interaktiver Chat mit einem Modell
 docker exec -it ollama ollama run llama2
 ```
+
+> **Hinweis zu Hardware-Beschleunigung**: Mit aktivierter Hardware-Beschleunigung (NVIDIA/AMD GPU oder Apple Silicon) werden die Modelle deutlich schneller ausgeführt. Du kannst die Hardware-Beschleunigung testen mit:
+> ```bash
+> docker exec -it ollama ollama run llama2 "Läuft dieser Text auf meiner GPU oder CPU?" --verbose
+> ```
+> In der Ausgabe solltest du Informationen zur verwendeten Hardware-Beschleunigung sehen.
 
 ## 🔍 Using Supabase UI (Optional)
 
@@ -252,13 +282,14 @@ docker-compose up -d --force-recreate
 **Container won't start:**
 ```bash
 # Check logs
-docker-compose logs
+docker compose logs
 
 # Check volumes
 docker volume ls
 
 # Check ports
 netstat -ano | findstr :5678  # Windows
+lsof -i :5678  # Linux/macOS
 ```
 
 **Database connection fails:**
@@ -269,6 +300,37 @@ docker exec -it postgres-db pg_isready -U postgres
 # Test network connection
 docker exec -it n8n ping postgres-db
 ```
+
+### Hardware-Beschleunigung Probleme
+
+**Überprüfen der GPU-Erkennung:**
+
+```bash
+# Für NVIDIA GPUs
+docker exec -it ollama nvidia-smi
+
+# Für AMD GPUs auf Linux
+docker exec -it ollama rocm-smi
+
+# Testen der Hardware-Beschleunigung
+docker exec -it ollama ollama run llama2 "Wird meine GPU genutzt?" --verbose
+```
+
+**Typische Probleme:**
+
+1. **NVIDIA GPU wird nicht erkannt:**
+   - Stelle sicher, dass du die neuesten NVIDIA-Treiber installiert hast
+   - Überprüfe, dass der NVIDIA Container Toolkit installiert und aktiviert ist
+
+2. **Docker-compose vs Docker compose:**
+   - Verwende `docker compose` (mit Leerzeichen) für Docker Compose V2
+   - Verwende `docker-compose` (mit Bindestrich) nur für ältere Docker-Versionen mit Docker Compose V1
+
+3. **Hardware-Beschleunigung aktiviert sich nicht:**
+   - Führe `./detect-hardware.sh` oder `.\detect-hardware.ps1` aus, um die automatische Erkennung zu starten
+   - Überprüfe die `.env`-Datei auf korrekte Hardware-Einstellungen
+
+Detaillierte Fehlerbehebung findest du in der [HARDWARE-ACCELERATION.md](HARDWARE-ACCELERATION.md).
 
 **Resolve port conflicts:**
 ```env
