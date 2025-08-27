@@ -27,6 +27,7 @@ try {
         foreach ($line in $gpuInfo -split "`n") {
             Write-Host "   $line"
         }
+        
         Write-Host ""
         Write-Host "Testing GPU with Ollama..." -ForegroundColor Blue
         Write-Host "This will check if Ollama can access the GPU" -ForegroundColor Gray
@@ -52,13 +53,18 @@ try {
                 }
             }
         }
+    } else {
+        Write-Host "⚠️ NVIDIA GPU not detected or not properly configured." -ForegroundColor Yellow
     }
 } catch {
     Write-Host "⚠️ NVIDIA GPU not detected or not properly configured." -ForegroundColor Yellow
-    
-    # Check CPU acceleration
-    Write-Host "Checking for CPU acceleration features..." -ForegroundColor Blue
-    
+}
+
+# Check CPU acceleration
+Write-Host ""
+Write-Host "Checking for CPU acceleration features..." -ForegroundColor Blue
+
+try {
     $cpuInfoOutput = docker exec -it ollama cat /proc/cpuinfo
     if ($cpuInfoOutput | Select-String -Pattern "avx2|avx512") {
         Write-Host "✅ CPU supports AVX2/AVX512 instructions for acceleration" -ForegroundColor Green
@@ -82,16 +88,22 @@ try {
         Write-Host "❌ CPU does not support advanced vector instructions (AVX)." -ForegroundColor Red
         Write-Host "   LLM inference will be significantly slower." -ForegroundColor Yellow
     }
+} catch {
+    Write-Host "❌ Could not check CPU features." -ForegroundColor Red
 }
 
 Write-Host ""
 Write-Host "Memory configuration:" -ForegroundColor Blue
-$memInfo = docker exec -it ollama cat /proc/meminfo | Select-String -Pattern "MemTotal|MemAvailable"
-$memInfo | ForEach-Object {
-    $line = $_ -replace ":\s+", " "
-    $parts = $line -split "\s+"
-    $gbValue = [math]::Round([int]$parts[1] / 1024 / 1024, 2)
-    Write-Host "   $($parts[0]) $gbValue GB"
+try {
+    $memInfo = docker exec -it ollama cat /proc/meminfo | Select-String -Pattern "MemTotal|MemAvailable"
+    $memInfo | ForEach-Object {
+        $line = $_ -replace ":\s+", " "
+        $parts = $line -split "\s+"
+        $gbValue = [math]::Round([int]$parts[1] / 1024 / 1024, 2)
+        Write-Host "   $($parts[0]) $gbValue GB"
+    }
+} catch {
+    Write-Host "❌ Could not check memory configuration." -ForegroundColor Red
 }
 
 Write-Host ""
