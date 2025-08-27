@@ -265,39 +265,114 @@ docker compose down -v
 
 ### View Logs
 ```bash
-# All services
-docker-compose logs -f
+# All services (follow mode)
+docker compose logs -f
 
 # Single service
-docker-compose logs -f n8n
-docker-compose logs -f ollama
-docker-compose logs -f postgres-db
+docker compose logs -f n8n
+docker compose logs -f ollama
+docker compose logs -f postgres-db
+
+# Filter for errors only
+docker compose logs | grep -i error
+
+# Get logs since a specific time
+docker compose logs --since=2023-08-27T00:00:00
 ```
 
-### Perform Updates
+### Container Status & Health Checks
 ```bash
-# Update images
-docker-compose pull
+# Check container health and status
+docker compose ps
 
-# Restart with new images
-docker-compose up -d --force-recreate
+# Detailed container inspection
+docker inspect ollama | grep -i status
+
+# Check resource usage of containers
+docker stats
+
+# Test if services are responsive
+curl -s http://localhost:11434/api/version    # Ollama API
+curl -s http://localhost:5678/healthz         # n8n health check
 ```
 
-## 🚨 Troubleshooting
+### Advanced Container Management
+```bash
+# Restart a single service
+docker compose restart n8n
+
+# Scale a specific service (where supported)
+docker compose up -d --scale n8n=2
+
+# Execute a command in a running container
+docker compose exec ollama bash
+
+# View environment variables of a container
+docker compose exec n8n env | sort
+```
+
+⚠️ **Warning About Data Loss**: Commands that remove volumes or use the `-v` flag will permanently delete your data. Always create backups before using destructive commands.
+
+## � Data Management
+
+### Backup & Restore
+
+#### Regular Backups (Recommended)
+Schedule regular backups to prevent data loss:
+
+```bash
+# Create a backup script (example for Linux/macOS)
+cat > backup.sh << 'EOL'
+#!/bin/bash
+BACKUP_DIR="backups/$(date +%Y%m%d_%H%M)"
+mkdir -p $BACKUP_DIR
+docker exec n8n-db pg_dump -U n8n_user n8n > $BACKUP_DIR/n8n.sql
+docker exec memory-db pg_dump -U memory_user n8n_memory > $BACKUP_DIR/memory.sql
+docker exec postgres-db pg_dump -U postgres postgres > $BACKUP_DIR/postgres.sql
+cp .env $BACKUP_DIR/.env.backup
+echo "Backup completed: $BACKUP_DIR"
+EOL
+chmod +x backup.sh
+
+# Add to crontab (runs daily at 2am)
+(crontab -l 2>/dev/null; echo "0 2 * * * $(pwd)/backup.sh") | crontab -
+```
+
+#### Data Migration
+To migrate your data to another machine:
+
+1. Create a full backup on the source system
+2. Transfer backup files to the new system
+3. Set up the AI-Chat-Agent on the new system
+4. Restore databases and config files from backup
+
+⚠️ **CAUTION**: Always test the restoration process in a safe environment first.
+
+## �🚨 Troubleshooting
 
 ### Common Issues
 
 **Container won't start:**
 ```bash
-# Check logs
+# Check detailed logs
 docker compose logs
 
-# Check volumes
-docker volume ls
+# Check specific service logs
+docker compose logs n8n
+docker compose logs ollama
 
-# Check ports
+# Check if volumes exist and are properly mounted
+docker volume ls
+docker volume inspect ai-chat-agent_n8n_data
+
+# Check if ports are already in use
 netstat -ano | findstr :5678  # Windows
 lsof -i :5678  # Linux/macOS
+
+# Check Docker service status
+systemctl status docker  # Linux
+brew services info docker-machine  # macOS
+Get-Service docker  # Windows PowerShell
 ```
 
 **Database connection fails:**
@@ -393,21 +468,77 @@ AI-Chat-Agent/
 
 ## 🔄 Updates & Maintenance
 
-### Update Git Repository
+### Safe Update Procedure
+⚠️ **IMPORTANT**: Always create a backup before updating to avoid data loss!
+
+#### 1. Create a Backup First
 ```bash
-git pull origin main
-docker-compose pull
-docker-compose up -d --force-recreate
+# Create a timestamped backup directory
+mkdir -p backups/$(date +%Y%m%d)
+
+# PostgreSQL Backups
+docker exec n8n-db pg_dump -U n8n_user n8n > backups/$(date +%Y%m%d)/backup_n8n.sql
+docker exec memory-db pg_dump -U memory_user n8n_memory > backups/$(date +%Y%m%d)/backup_memory.sql
+docker exec postgres-db pg_dump -U postgres postgres > backups/$(date +%Y%m%d)/backup_postgres.sql
+
+# Volume Backups
+docker run --rm -v n8n_data:/data -v $(pwd)/backups/$(date +%Y%m%d):/backup alpine tar czf /backup/n8n_data.tar.gz /data
+docker run --rm -v postgres_data:/data -v $(pwd)/backups/$(date +%Y%m%d):/backup alpine tar czf /backup/postgres_data.tar.gz /data
+
+# Backup your .env file
+cp .env backups/$(date +%Y%m%d)/.env.backup
 ```
 
-### Create Backup
+#### 2. Update the Repository
 ```bash
-# PostgreSQL Backup
-docker exec n8n-postgres pg_dump -U n8n_user n8n > backup_n8n.sql
-docker exec postgres-db pg_dump -U postgres postgres > backup_postgres.sql
+# Get latest code changes
+git pull origin main
+```
 
-# Volume Backup
-docker run --rm -v n8n_data:/data -v ${PWD}:/backup alpine tar czf /backup/n8n_backup.tar.gz /data
+#### 3. Update Docker Images Without Data Loss
+```bash
+# Pull latest images
+docker compose pull
+
+# Recreate containers with updated images (preserves volumes)
+docker compose up -d --force-recreate
+```
+
+### Rolling Back Updates
+If an update causes issues, you can roll back to your previous state:
+
+```bash
+# Stop the problematic containers
+./stop-services.sh  # or .\stop-services.ps1 on Windows
+
+# Restore from the most recent backup
+# Example for PostgreSQL database restoration:
+cat backups/YYYYMMDD/backup_postgres.sql | docker exec -i postgres-db psql -U postgres
+cat backups/YYYYMMDD/backup_n8n.sql | docker exec -i n8n-db psql -U n8n_user n8n
+cat backups/YYYYMMDD/backup_memory.sql | docker exec -i memory-db psql -U memory_user n8n_memory
+
+# Restore your original .env file if needed
+cp backups/YYYYMMDD/.env.backup .env
+
+# Restart with the previous configuration
+./start-with-hardware-acceleration.sh  # or use the PowerShell version on Windows
+```
+
+### Complete Reset (Fresh Start)
+⚠️ **WARNING**: This will permanently delete ALL your data! Use with extreme caution!
+
+```bash
+# Stop all containers and remove all data volumes
+docker compose down -v
+
+# Optional: Remove all related Docker volumes manually
+docker volume rm ai-chat-agent_n8n_data
+docker volume rm ai-chat-agent_postgres_data
+docker volume rm ai-chat-agent_memory_data
+docker volume rm ai-chat-agent_ollama_data
+
+# Recreate the environment from scratch
+./setup-automated.sh  # or .\setup-automated.ps1 on Windows
 ```
 
 ## 📦 Automated Installation
