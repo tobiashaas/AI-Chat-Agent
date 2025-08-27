@@ -1,14 +1,14 @@
 #!/bin/bash
-# Hardware-Erkennung und automatischer Start mit optimaler Konfiguration
-# Dieses Skript erkennt die verfügbare Hardware-Beschleunigung und startet den Stack mit passender Konfiguration
+# Hardware detection and automatic start with optimal configuration
+# This script detects available hardware acceleration and starts the stack with appropriate configuration
 
-# Farbdefinitionen
+# Color definitions
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# Funktion für Status-Meldungen
+# Function for status messages
 print_status() {
     echo -e "${CYAN}==> $1${NC}"
 }
@@ -25,33 +25,33 @@ print_warning() {
 if [ "$(uname)" == "Darwin" ]; then
     OS="MacOS"
     if [ "$(uname -m)" == "arm64" ]; then
-        print_success "Apple Silicon erkannt"
+        print_success "Apple Silicon detected"
         HARDWARE="apple"
     else
-        print_warning "Intel Mac erkannt"
+        print_warning "Intel Mac detected"
         HARDWARE="cpu"
     fi
 elif [ "$(uname)" == "Linux" ]; then
     OS="Linux"
     if command -v nvidia-smi &> /dev/null; then
         NVIDIA_INFO=$(nvidia-smi --query-gpu=name --format=csv,noheader)
-        print_success "NVIDIA GPU erkannt: $NVIDIA_INFO"
+        print_success "NVIDIA GPU detected: $NVIDIA_INFO"
         HARDWARE="nvidia"
     elif command -v lspci &> /dev/null && lspci | grep -i amd | grep -i vga &> /dev/null; then
         AMD_INFO=$(lspci | grep -i amd | grep -i vga | head -n1)
-        print_success "AMD GPU erkannt: $AMD_INFO"
+        print_success "AMD GPU detected: $AMD_INFO"
         HARDWARE="amd"
     else
-        print_warning "Keine GPU erkannt unter Linux"
+        print_warning "No GPU detected on Linux"
         HARDWARE="cpu"
     fi
 else
     OS="Unknown"
     HARDWARE="cpu"
-    print_warning "Unbekanntes Betriebssystem, verwende CPU-Modus"
+    print_warning "Unknown operating system, using CPU mode"
 fi
 
-# Bestimme Speicherlimit basierend auf verfügbarem RAM
+# Determine memory limit based on available RAM
 if [ "$(uname)" == "Darwin" ]; then
     TOTAL_MEM_KB=$(sysctl hw.memsize | awk '{print $2}')
     TOTAL_MEM_GB=$((TOTAL_MEM_KB / 1024 / 1024 / 1024))
@@ -62,7 +62,7 @@ else
     TOTAL_MEM_GB=8
 fi
 
-# Verwende 50% des Systemspeichers, aber nicht weniger als 4GB und nicht mehr als 16GB
+# Use 50% of system memory, but not less than 4GB and not more than 16GB
 OLLAMA_MEM=$((TOTAL_MEM_GB / 2))
 if [ $OLLAMA_MEM -lt 4 ]; then
     OLLAMA_MEM=4
@@ -70,40 +70,40 @@ elif [ $OLLAMA_MEM -gt 16 ]; then
     OLLAMA_MEM=16
 fi
 
-# Aktualisiere .env Datei mit Speicherlimit
+# Update .env file with memory limit
 sed -i.bak "s/OLLAMA_MEMORY_LIMIT=.*/OLLAMA_MEMORY_LIMIT=${OLLAMA_MEM}G/" .env 2>/dev/null || \
 echo "OLLAMA_MEMORY_LIMIT=${OLLAMA_MEM}G" >> .env
 
 echo ""
 print_status "=============================================="
-print_status "Hardware-Erkennung: $HARDWARE"
-print_status "Betriebssystem: $OS"
-print_status "Ollama Speicherlimit: ${OLLAMA_MEM}G"
+print_status "Hardware Detection: $HARDWARE"
+print_status "Operating System: $OS"
+print_status "Ollama Memory Limit: ${OLLAMA_MEM}G"
 print_status "=============================================="
 echo ""
 
-# Stoppe laufende Container
-print_status "Stoppe laufende Container..."
+# Stop running containers
+print_status "Stopping running containers..."
 docker compose down
 
-# Starte mit passender Compose-Datei
+# Start with appropriate compose file
 if [ "$HARDWARE" == "nvidia" ]; then
-    print_success "Starte mit NVIDIA GPU-Beschleunigung..."
+    print_success "Starting with NVIDIA GPU acceleration..."
     docker compose -f docker-compose.yml -f docker-compose.nvidia.yml up -d --remove-orphans || echo "Ignoriere Validierungswarnungen"
 elif [ "$HARDWARE" == "amd" ]; then
-    print_success "Starte mit AMD GPU-Beschleunigung..."
+    print_success "Starting with AMD GPU acceleration..."
     docker compose -f docker-compose.yml -f docker-compose.amd.yml up -d --remove-orphans || echo "Ignoriere Validierungswarnungen"
 elif [ "$HARDWARE" == "apple" ]; then
-    print_success "Starte mit Apple Silicon-Beschleunigung..."
+    print_success "Starting with Apple Silicon acceleration..."
     docker compose -f docker-compose.yml -f docker-compose.apple.yml up -d --remove-orphans || echo "Ignoriere Validierungswarnungen"
 else
-    print_warning "Starte ohne Hardware-Beschleunigung..."
+    print_warning "Starting without hardware acceleration..."
     docker compose up -d --remove-orphans || echo "Ignoriere Validierungswarnungen"
 fi
 
 echo ""
-print_success "Start abgeschlossen!"
-print_status "Zugriff auf die Dienste:"
+print_success "Startup completed!"
+print_status "Access to services:"
 echo -e "${CYAN}- n8n: http://localhost:5678${NC}"
 echo -e "${CYAN}- Open WebUI: http://localhost:3000${NC}"
 echo -e "${CYAN}- Ollama API: http://localhost:11434${NC}"

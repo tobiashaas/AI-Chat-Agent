@@ -120,7 +120,7 @@ services:
       resources:
         limits:
           memory: ${OLLAMA_MEMORY_LIMIT:-8G}
-    # Hardware Acceleration Umgebungsvariablen werden je nach erkannter Hardware gesetzt
+    # Hardware Acceleration environment variables are set based on detected hardware
     environment:
       # NVIDIA GPU Support
       - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-none}
