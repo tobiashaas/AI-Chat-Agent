@@ -45,27 +45,27 @@ notepad .env  # Adjust passwords and keys!
 
 ### 4. Start Services
 
-**Option A: Standard-Start (ohne Hardware-Beschleunigung)**
+**Option A: Standard Start (without hardware acceleration)**
 
 ```bash
-# Verwende docker compose (mit Leerzeichen) für Docker Compose V2
+# Use docker compose (with space) for Docker Compose V2
 docker compose up -d
 ```
 
-**Option B: Mit automatischer Hardware-Beschleunigung (empfohlen)**
+**Option B: With automatic hardware acceleration (recommended)**
 
 ```bash
-# Auf Windows (PowerShell)
+# On Windows (PowerShell)
 .\start-with-acceleration.ps1
 
-# Auf Linux/macOS
+# On Linux/macOS
 chmod +x ./start-with-acceleration.sh
 ./start-with-acceleration.sh
 ```
 
-Diese Methode erkennt automatisch deine GPU oder NPU und verwendet die optimale Konfiguration für dein System.
+This method automatically detects your GPU or NPU and uses the optimal configuration for your system.
 
-> **Hinweis:** Wenn du alte Anleitungen oder Tutorials siehst, die `docker-compose` (mit Bindestrich) verwenden, ersetze diesen Befehl durch `docker compose` (mit Leerzeichen), da dies die neuere Version von Docker Compose ist (V2).
+> **Note:** If you see older guides or tutorials using `docker-compose` (with hyphen), replace this command with `docker compose` (with space), as this is the newer version of Docker Compose (V2).
 
 ### 5. Access Services
 
@@ -77,25 +77,25 @@ Diese Methode erkennt automatisch deine GPU oder NPU und verwendet die optimale 
 ## 🛠️ Requirements
 
 - **Docker** (Version 20.10+)
-- **Docker Compose V2** (integriert in neueren Docker-Versionen)
+- **Docker Compose V2** (integrated in newer Docker versions)
 - **Minimum 8GB RAM**
-- **SSD recommended** für bessere Performance
+- **SSD recommended** for better performance
 
-## 🚀 Hardware-Beschleunigung (neu!)
+## 🚀 Hardware Acceleration (new!)
 
-Dieser Stack unterstützt verschiedene Hardware-Beschleunigungstechnologien für verbesserte KI-Performance:
+This stack supports various hardware acceleration technologies for improved AI performance:
 
-- **NVIDIA GPUs**: Automatisch konfiguriert mit CUDA für LLM-Beschleunigung
-- **AMD GPUs**: Unterstützt ROCm für Linux und DirectML für Windows
-- **Apple Silicon**: Optimiert für M1/M2/M3-Chips mit Metal Performance Shaders
-- **Intel NPUs**: Experimentelle Unterstützung für Intel Neural Processing Units
-- **Intel/AMD CPUs**: Nutzt AVX2/AVX512-Instruktionen wenn verfügbar
+- **NVIDIA GPUs**: Automatically configured with CUDA for LLM acceleration
+- **AMD GPUs**: Supports ROCm for Linux and DirectML for Windows
+- **Apple Silicon**: Optimized for M1/M2/M3 chips with Metal Performance Shaders
+- **Intel NPUs**: Experimental support for Intel Neural Processing Units
+- **Intel/AMD CPUs**: Utilizes AVX2/AVX512 instructions when available
 
-### Automatische Erkennung und Konfiguration
+### Automatic Detection and Configuration
 
-Die enthaltenen Skripte `start-with-acceleration.sh` (für Linux/macOS) und `start-with-acceleration.ps1` (für Windows) erkennen automatisch deine verfügbare Hardware und konfigurieren den Stack entsprechend.
+The included scripts `start-with-acceleration.sh` (for Linux/macOS) and `start-with-acceleration.ps1` (for Windows) automatically detect your available hardware and configure the stack accordingly.
 
-Detaillierte Konfigurationsoptionen und Informationen zur manuellen Einrichtung findest du in der [HARDWARE-ACCELERATION.md](HARDWARE-ACCELERATION.md).
+Detailed configuration options and information for manual setup can be found in the [HARDWARE-ACCELERATION.md](HARDWARE-ACCELERATION.md).
 
 ## 💻 Cross-Platform Support
 
@@ -160,37 +160,37 @@ All services run in the `ai_network` Docker network:
 
 ## 🤖 Installing Ollama Models
 
-Nach dem Start kannst du unsere Modell-Installer-Skripte verwenden:
+After startup, you can use our model installer scripts:
 
 ```bash
-# Auf Windows (PowerShell)
+# On Windows (PowerShell)
 .\install-models.ps1
 
-# Auf Linux/macOS
+# On Linux/macOS
 chmod +x ./install-models.sh
 ./install-models.sh
 ```
 
-Du kannst auch manuell Modelle installieren:
+You can also manually install models:
 
 ```bash
-# Beliebte Modelle herunterladen
+# Download popular models
 docker exec -it ollama ollama pull llama2
 docker exec -it ollama ollama pull mistral
 docker exec -it ollama ollama pull codellama
 
-# Verfügbare Modelle auflisten
+# List available models
 docker exec -it ollama ollama list
 
-# Interaktiver Chat mit einem Modell
+# Interactive chat with a model
 docker exec -it ollama ollama run llama2
 ```
 
-> **Hinweis zu Hardware-Beschleunigung**: Mit aktivierter Hardware-Beschleunigung (NVIDIA/AMD GPU oder Apple Silicon) werden die Modelle deutlich schneller ausgeführt. Du kannst die Hardware-Beschleunigung testen mit:
+> **Note on Hardware Acceleration**: With hardware acceleration enabled (NVIDIA/AMD GPU or Apple Silicon), models run significantly faster. You can test hardware acceleration with:
 > ```bash
-> docker exec -it ollama ollama run llama2 "Läuft dieser Text auf meiner GPU oder CPU?" --verbose
+> docker exec -it ollama ollama run llama2 "Is this text running on my GPU or CPU?" --verbose
 > ```
-> In der Ausgabe solltest du Informationen zur verwendeten Hardware-Beschleunigung sehen.
+> The output should show information about the hardware acceleration being used.
 
 ## 🔍 Using Supabase UI (Optional)
 
@@ -301,36 +301,36 @@ docker exec -it postgres-db pg_isready -U postgres
 docker exec -it n8n ping postgres-db
 ```
 
-### Hardware-Beschleunigung Probleme
+### Hardware Acceleration Issues
 
-**Überprüfen der GPU-Erkennung:**
+**Check GPU Detection:**
 
 ```bash
-# Für NVIDIA GPUs
+# For NVIDIA GPUs
 docker exec -it ollama nvidia-smi
 
-# Für AMD GPUs auf Linux
+# For AMD GPUs on Linux
 docker exec -it ollama rocm-smi
 
-# Testen der Hardware-Beschleunigung
-docker exec -it ollama ollama run llama2 "Wird meine GPU genutzt?" --verbose
+# Test hardware acceleration
+docker exec -it ollama ollama run llama2 "Is my GPU being used?" --verbose
 ```
 
-**Typische Probleme:**
+**Common Issues:**
 
-1. **NVIDIA GPU wird nicht erkannt:**
-   - Stelle sicher, dass du die neuesten NVIDIA-Treiber installiert hast
-   - Überprüfe, dass der NVIDIA Container Toolkit installiert und aktiviert ist
+1. **NVIDIA GPU not detected:**
+   - Make sure you have the latest NVIDIA drivers installed
+   - Verify that the NVIDIA Container Toolkit is installed and activated
 
 2. **Docker-compose vs Docker compose:**
-   - Verwende `docker compose` (mit Leerzeichen) für Docker Compose V2
-   - Verwende `docker-compose` (mit Bindestrich) nur für ältere Docker-Versionen mit Docker Compose V1
+   - Use `docker compose` (with space) for Docker Compose V2
+   - Use `docker-compose` (with hyphen) only for older Docker versions with Docker Compose V1
 
-3. **Hardware-Beschleunigung aktiviert sich nicht:**
-   - Führe `./detect-hardware.sh` oder `.\detect-hardware.ps1` aus, um die automatische Erkennung zu starten
-   - Überprüfe die `.env`-Datei auf korrekte Hardware-Einstellungen
+3. **Hardware acceleration doesn't activate:**
+   - Run `./detect-hardware.sh` or `.\detect-hardware.ps1` to start automatic detection
+   - Check the `.env` file for correct hardware settings
 
-Detaillierte Fehlerbehebung findest du in der [HARDWARE-ACCELERATION.md](HARDWARE-ACCELERATION.md).
+For detailed troubleshooting, see the [HARDWARE-ACCELERATION.md](HARDWARE-ACCELERATION.md).
 
 **Resolve port conflicts:**
 ```env
