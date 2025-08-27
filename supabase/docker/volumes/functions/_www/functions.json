@@ -1,9 +1,0 @@
-{
-  "functions": [
-    {
-      "name": "main",
-      "path": "/main",
-      "entrypoint": "main.js"
-    }
-  ]
-}
