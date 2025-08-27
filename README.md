@@ -127,6 +127,24 @@ docker exec -it ollama ollama list
 docker exec -it ollama ollama run llama2
 ```
 
+## 🔍 Using Supabase UI (Optional)
+
+If you prefer a visual interface to manage your database, you can use the optional Supabase UI:
+
+```bash
+# Start Supabase UI (after starting the main stack)
+docker-compose -f docker-compose-supabase.yml up -d
+
+# On Windows, you can also use the convenience script:
+.\start-supabase.cmd
+```
+
+The Supabase UI will be available at:
+- **Supabase Studio**: http://localhost:3001
+- **API Endpoint**: http://localhost:8000
+
+For more details, see the [SUPABASE-README.md](SUPABASE-README.md) file.
+
 ## 🎯 Use Cases & Examples
 
 ### n8n AI Workflows
@@ -140,6 +158,12 @@ docker exec -it ollama ollama run llama2
 - **Data storage** for all application data
 - **File storage** in the storage schema
 - **Metadata management** for AI assets
+
+### Supabase UI (Optional)
+- Visual database management with Supabase Studio
+- API explorer and documentation
+- Storage management interface
+- Authentication dashboard
 
 ### Data Sharing
 - Share files between services via `./shared-files` volume
@@ -239,11 +263,14 @@ echo "my_password" | docker secret create db_password -
 ```
 AI-Chat-Agent/
 ├── docker-compose.yml          # Main configuration
+├── docker-compose-supabase.yml # Optional Supabase UI configuration
 ├── .env                        # Local environment variables
 ├── setup-automated.ps1         # Windows setup script
+├── start-supabase-ui.ps1       # Supabase UI starter script
 ├── shared-files/               # Shared files between containers
 ├── init.sql                    # Database initialization script
 ├── README.md                   # This file
+├── SUPABASE-README.md          # Supabase UI documentation
 └── .gitignore                  # Git ignore rules
 ```
 
