@@ -115,10 +115,20 @@ services:
       - ollama_data:/root/.ollama
     networks:
       - ai_network
+    # GPU support
     deploy:
       resources:
         limits:
           memory: 8G
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    # Use hardware acceleration (CUDA or CPU features)
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     # Security enhancements
     security_opt:
       - no-new-privileges:true

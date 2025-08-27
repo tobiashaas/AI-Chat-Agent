@@ -62,7 +62,17 @@ docker-compose up -d
 - **Docker Compose** (Version 2.0+)
 - **Minimum 8GB RAM**
 - **SSD recommended** for better performance
-- **NVIDIA GPU** (optional, for Ollama performance)
+- **GPU or AI accelerated CPU** (configured for better Ollama performance)
+
+## 🚀 Hardware Acceleration
+
+This stack supports hardware acceleration for improved AI performance:
+
+- **NVIDIA GPUs**: Automatically configured for LLM acceleration
+- **Intel/AMD CPUs**: Uses AVX2/AVX512 instructions when available
+- **Apple Silicon**: Optimized for M1/M2/M3 chips
+
+See the [HARDWARE-ACCELERATION.md](HARDWARE-ACCELERATION.md) guide for detailed configuration options.
 
 ## 💻 Cross-Platform Support
 
