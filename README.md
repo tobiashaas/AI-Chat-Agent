@@ -243,16 +243,24 @@ For more details, see the [SUPABASE-README.md](SUPABASE-README.md) file.
 ### Container Management
 ```bash
 # Check status
-docker-compose ps
+docker compose ps
 
 # Stop services
-docker-compose stop
+docker compose stop
+
+# Stop services with the same scripts used to start them
+# On Windows (PowerShell)
+.\stop-services.ps1
+
+# On Linux/macOS
+chmod +x ./stop-services.sh
+./stop-services.sh
 
 # Restart services
-docker-compose restart
+docker compose restart
 
 # Delete all data (⚠️ Caution!)
-docker-compose down -v
+docker compose down -v
 ```
 
 ### View Logs
@@ -370,6 +378,10 @@ AI-Chat-Agent/
 ├── setup-automated.sh          # Linux/macOS setup script
 ├── start-supabase-ui.ps1       # Windows Supabase UI starter
 ├── start-supabase-ui.sh        # Linux/macOS Supabase UI starter
+├── start-with-hardware-acceleration.ps1 # Windows start with hardware detection
+├── start-with-hardware-acceleration.sh  # Linux/macOS start with hardware detection
+├── stop-services.ps1           # Windows service stopper
+├── stop-services.sh            # Linux/macOS service stopper
 ├── install-models.ps1          # Windows Ollama model installer
 ├── install-models.sh           # Linux/macOS Ollama model installer
 ├── shared-files/               # Shared files between containers
