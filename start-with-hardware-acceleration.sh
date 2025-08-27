@@ -89,16 +89,16 @@ docker compose down
 # Start with appropriate compose file
 if [ "$HARDWARE" == "nvidia" ]; then
     print_success "Starting with NVIDIA GPU acceleration..."
-    docker compose -f docker-compose.yml -f docker-compose.nvidia.yml up -d --remove-orphans || echo "Ignoriere Validierungswarnungen"
+    docker compose -f docker-compose.yml -f docker-compose.nvidia.yml up -d --remove-orphans || echo "Ignoring validation warnings"
 elif [ "$HARDWARE" == "amd" ]; then
     print_success "Starting with AMD GPU acceleration..."
-    docker compose -f docker-compose.yml -f docker-compose.amd.yml up -d --remove-orphans || echo "Ignoriere Validierungswarnungen"
+    docker compose -f docker-compose.yml -f docker-compose.amd.yml up -d --remove-orphans || echo "Ignoring validation warnings"
 elif [ "$HARDWARE" == "apple" ]; then
     print_success "Starting with Apple Silicon acceleration..."
-    docker compose -f docker-compose.yml -f docker-compose.apple.yml up -d --remove-orphans || echo "Ignoriere Validierungswarnungen"
+    docker compose -f docker-compose.yml -f docker-compose.apple.yml up -d --remove-orphans || echo "Ignoring validation warnings"
 else
     print_warning "Starting without hardware acceleration..."
-    docker compose up -d --remove-orphans || echo "Ignoriere Validierungswarnungen"
+    docker compose up -d --remove-orphans || echo "Ignoring validation warnings"
 fi
 
 echo ""
