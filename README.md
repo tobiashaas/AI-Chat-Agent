@@ -30,6 +30,10 @@ cd AI-Chat-Agent
 # On Windows (PowerShell)
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 .\setup-automated.ps1
+
+# On Linux/macOS
+chmod +x ./setup-automated.sh
+./setup-automated.sh
 ```
 
 ### 3. Configure Environment Variables (optional)
@@ -59,6 +63,16 @@ docker-compose up -d
 - **Minimum 8GB RAM**
 - **SSD recommended** for better performance
 - **NVIDIA GPU** (optional, for Ollama performance)
+
+## 💻 Cross-Platform Support
+
+This stack has been designed to work across multiple operating systems:
+
+- **Windows**: Full PowerShell automation with `.ps1` scripts
+- **Linux**: Complete Bash script support with `.sh` scripts
+- **macOS**: Full compatibility with the same Linux scripts
+
+All automation scripts are provided in both PowerShell and Bash versions to ensure a seamless experience regardless of your operating system.
 
 ## 🔐 Security Configuration
 
@@ -112,7 +126,18 @@ All services run in the `ai_network` Docker network:
 
 ## 🤖 Installing Ollama Models
 
-After starting, you can install AI models:
+After starting, you can use our model installer scripts:
+
+```bash
+# On Windows (PowerShell)
+.\install-models.ps1
+
+# On Linux/macOS
+chmod +x ./install-models.sh
+./install-models.sh
+```
+
+You can also manually install models:
 
 ```bash
 # Download popular models
@@ -132,11 +157,15 @@ docker exec -it ollama ollama run llama2
 If you prefer a visual interface to manage your database, you can use the optional Supabase UI:
 
 ```bash
-# Start Supabase UI (after starting the main stack)
-docker-compose -f docker-compose-supabase.yml up -d
+# On Windows (PowerShell)
+.\start-supabase-ui.ps1
 
-# On Windows, you can also use the convenience script:
-.\start-supabase.cmd
+# On Linux/macOS
+chmod +x ./start-supabase-ui.sh
+./start-supabase-ui.sh
+
+# Alternatively, use docker-compose directly:
+docker-compose -f docker-compose-supabase.yml up -d
 ```
 
 The Supabase UI will be available at:
@@ -266,7 +295,11 @@ AI-Chat-Agent/
 ├── docker-compose-supabase.yml # Optional Supabase UI configuration
 ├── .env                        # Local environment variables
 ├── setup-automated.ps1         # Windows setup script
-├── start-supabase-ui.ps1       # Supabase UI starter script
+├── setup-automated.sh          # Linux/macOS setup script
+├── start-supabase-ui.ps1       # Windows Supabase UI starter
+├── start-supabase-ui.sh        # Linux/macOS Supabase UI starter
+├── install-models.ps1          # Windows Ollama model installer
+├── install-models.sh           # Linux/macOS Ollama model installer
 ├── shared-files/               # Shared files between containers
 ├── init.sql                    # Database initialization script
 ├── README.md                   # This file
