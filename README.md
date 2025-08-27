@@ -1,331 +1,324 @@
 # 🚀 Self-Hosted AI Development Stack
 
-**n8n + PostgreSQL + Supabase + Ollama - Security Enhanced Version**
+**n8n + PostgreSQL + Ollama - Vereinfachte und verbesserte Version**
 
-A complete Docker Compose configuration for a modern AI development environment. All services run locally in a shared Docker network and communicate seamlessly with each other.
+Eine komplette Docker Compose-Konfiguration für eine moderne KI-Entwicklungsumgebung. Alle Dienste laufen lokal in einem gemeinsamen Docker-Netzwerk und kommunizieren nahtlos miteinander.
 
-## 📦 Included Components
+## 📦 Enthaltene Komponenten
 
-| Service | Description | Port | Security Level |
+| Dienst | Beschreibung | Port | Sicherheitsstufe |
 |---------|-------------|------|---------------|
-| **n8n** | Workflow Automation Platform | 5678 | 🔒🔒🔒 |
-| **PostgreSQL** | Main database for n8n | - | 🔒🔒🔒 |
-| **Memory PostgreSQL** | Separate DB for AI Agent Memory | - | 🔒🔒🔒 |
-| **Supabase** | Complete Backend-as-a-Service | 3001, 8000 | 🔒🔒🔒 |
-| **Ollama** | Local LLM Server | 11434 | 🔒🔒 |
-| **Open WebUI** | Chat Interface for Ollama | 3000 | 🔒🔒 |
+| **n8n** | Workflow Automatisierungsplattform | 5678 | 🔒🔒🔒 |
+| **PostgreSQL** | Hauptdatenbank für n8n | - | 🔒🔒🔒 |
+| **Memory PostgreSQL** | Separate DB für AI Agent Memory | - | 🔒🔒🔒 |
+| **PostgreSQL für Daten** | Vereinfachte Datenbank mit auth/storage-Schemas | 5432 | 🔒🔒🔒 |
+| **Ollama** | Lokaler LLM-Server | 11434 | 🔒🔒 |
+| **Open WebUI** | Chat-Interface für Ollama | 3000 | 🔒🔒 |
 
-## ⚡ Quick Start
+## ⚡ Schnellstart
 
-### 1. Clone the repository
+### 1. Repository klonen
 
 ```bash
 git clone https://github.com/username/AI-Chat-Agent.git
 cd AI-Chat-Agent
 ```
 
-### 2. Automated setup (Recommended)
+### 2. Automatisches Setup (Empfohlen)
 
 ```bash
-# On Linux/macOS
-chmod +x setup-automated.sh
-./setup-automated.sh
-
-# On Windows (PowerShell)
+# Unter Windows (PowerShell)
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 .\setup-automated.ps1
 ```
 
-### 3. Configure environment variables
+### 3. Umgebungsvariablen konfigurieren (optional)
 
 ```bash
-# Review and adjust the automatically created .env file
-nano .env  # Adjust passwords and keys!
+# Überprüfen und anpassen der automatisch erstellten .env-Datei
+notepad .env  # Passwörter und Keys anpassen!
 ```
 
-### 4. Start services
+### 4. Dienste starten
 
 ```bash
-docker compose up -d
+docker-compose -f docker-compose-simple.yml up -d
 ```
 
-### 5. Access services
+### 5. Zugriff auf Dienste
 
 - 🔧 **n8n**: http://localhost:5678
-- 🗄️ **Supabase Studio**: http://localhost:3001
+- 🗄️ **PostgreSQL**: localhost:5432
 - 🤖 **Ollama API**: http://localhost:11434
 - 💬 **Open WebUI**: http://localhost:3000
-- 📊 **Supabase API**: http://localhost:8000
 
-## 🛠️ Requirements
+## 🛠️ Anforderungen
 
 - **Docker** (Version 20.10+)
 - **Docker Compose** (Version 2.0+)
 - **Minimum 8GB RAM**
-- **SSD recommended** for better performance
-- **NVIDIA GPU** (optional, for Ollama performance)
+- **SSD empfohlen** für bessere Performance
+- **NVIDIA GPU** (optional, für Ollama-Performance)
 
-## 🔐 Security Configuration
+## 🔐 Sicherheitskonfiguration
 
-⚠️ **IMPORTANT**: Before first start, adjust the `.env` file:
+⚠️ **WICHTIG**: Vor dem ersten Start, die `.env`-Datei anpassen:
 
-### Critical Settings
+### Kritische Einstellungen
 ```env
 # n8n Authentication
 N8N_AUTH_USER=your_secure_username
 N8N_AUTH_PASSWORD=YourSecurePassword123!
-N8N_ENCRYPTION_KEY=YourSuperSecureEncryptionKey32Plus  # 32+ characters
+N8N_ENCRYPTION_KEY=YourSuperSecureEncryptionKey32Plus  # 32+ Zeichen
 
-# Supabase
-POSTGRES_PASSWORD=YourSuperSecureSupabasePassword123!
-JWT_SECRET=YourSuperSecretJWTWith32PlusChars123  # 32+ characters
+# PostgreSQL
+POSTGRES_PASSWORD=YourSuperSecureDatabasePassword123!
 ```
 
-## 🔧 Security Enhancements
+## 🔧 Sicherheitsverbesserungen
 
-This stack has been enhanced with multiple security improvements:
+Diese Umgebung wurde mit mehreren Sicherheitsverbesserungen ausgestattet:
 
-1. **Container Hardening**
-   - All containers use `no-new-privileges:true`
-   - Proper resource constraints applied
-   - Non-root users where possible
+1. **Container-Härtung**
+   - Alle Container verwenden `no-new-privileges:true`
+   - Ordnungsgemäße Ressourcenbeschränkungen
+   - Nicht-root-Benutzer wo möglich
 
-2. **Network Security**
-   - Isolated bridge network with subnet definition
-   - Minimized exposed ports
-   - Restricted service-to-service communication
+2. **Netzwerksicherheit**
+   - Isoliertes Bridge-Netzwerk mit Subnet-Definition
+   - Minimierte exponierte Ports
+   - Eingeschränkte Service-zu-Service-Kommunikation
 
-3. **Data Protection**
-   - Volume permissions properly configured
-   - Read-only mounts where appropriate
-   - Secure handling of sensitive data
+3. **Datenschutz**
+   - Volume-Berechtigungen ordnungsgemäß konfiguriert
+   - Schreibgeschützte Mounts wo angemessen
+   - Sichere Handhabung sensibler Daten
 
-4. **Service Configuration**
-   - Disabled telemetry and analytics
-   - Rate limiting enabled
-   - Proper JWT refresh token rotation
-   - Strong password policies
+4. **Überwachung & Wiederherstellung**
+   - Zustandsprüfungen für alle kritischen Dienste
+   - Ordnungsgemäße Neustart-Richtlinien
+   - Strukturierte Protokollierung
 
-5. **Monitoring & Recovery**
-   - Health checks for all critical services
-   - Proper restart policies
-   - Structured logging
+## 🔗 Service-Kommunikation
 
-## 🔗 Service Communication
+Alle Dienste laufen im `ai_network` Docker-Netzwerk:
 
-All services run in the `ai_network` Docker network:
-
-| From n8n to | Connection String |
+| Von n8n zu | Verbindungsstring |
 |------------|-------------------|
 | PostgreSQL | `postgresql://n8n_user:password@n8n-db:5432/n8n` |
 | Memory DB | `postgresql://memory_user:password@memory-db:5432/n8n_memory` |
-| Supabase | `http://supabase-kong:8000/rest/v1/` |
+| Daten DB | `postgresql://postgres:password@postgres-db:5432/postgres` |
 | Ollama | `http://ollama:11434` |
 
-## 🤖 Installing Ollama Models
+## 🤖 Installieren von Ollama-Modellen
 
-After startup, you can install AI models:
+Nach dem Start können Sie KI-Modelle installieren:
 
 ```bash
-# Download popular models
+# Beliebte Modelle herunterladen
 docker exec -it ollama ollama pull llama2
 docker exec -it ollama ollama pull mistral
 docker exec -it ollama ollama pull codellama
 
-# List available models
+# Verfügbare Modelle auflisten
 docker exec -it ollama ollama list
 
-# Chat interactively with a model
+# Interaktiv mit einem Modell chatten
 docker exec -it ollama ollama run llama2
 ```
 
-## 🎯 Use Cases & Examples
+## 🎯 Anwendungsfälle & Beispiele
 
 ### n8n AI Workflows
-- **Chatbots** with local Ollama LLMs
-- **Document Processing** with AI analysis
-- **Data Pipelines** with Supabase integration
-- **Chat Memory** stored in PostgreSQL
+- **Chatbots** mit lokalen Ollama LLMs
+- **Dokumentenverarbeitung** mit KI-Analyse
+- **Datenpipelines** mit PostgreSQL-Integration
+- **Chat-Speicher** in PostgreSQL gespeichert
 
-### Supabase Backend
-- **User Authentication** and management
-- **REST APIs** for data queries
-- **File Storage** and management
-- **Realtime Updates** via WebSockets
+### PostgreSQL Datenbank
+- **Authentifizierung** und Benutzerverwaltung
+- **Datenspeicher** für alle Anwendungsdaten
+- **Dateispeicher** im Storage-Schema
+- **Metadatenverwaltung** für KI-Assets
 
-### File Sharing
-- Share files between services via `./shared-files` volume
-- CSV import in n8n, processing in Ollama
+### Datenaustausch
+- Dateien zwischen Diensten über `./shared-files` Volume teilen
+- CSV-Import in n8n, Verarbeitung in Ollama
 
-## 🔧 Management & Maintenance
+## 🔧 Verwaltung & Wartung
 
-### Container Management
+### Container-Verwaltung
 ```bash
-# Check status
-docker compose ps
+# Status prüfen
+docker-compose -f docker-compose-simple.yml ps
 
-# Stop services
-docker compose stop
+# Dienste stoppen
+docker-compose -f docker-compose-simple.yml stop
 
-# Restart services
-docker compose restart
+# Dienste neustarten
+docker-compose -f docker-compose-simple.yml restart
 
-# Delete all data (⚠️ Caution!)
-docker compose down -v
+# Alle Daten löschen (⚠️ Vorsicht!)
+docker-compose -f docker-compose-simple.yml down -v
 ```
 
-### Viewing Logs
+### Logs anzeigen
 ```bash
-# All services
-docker compose logs -f
+# Alle Dienste
+docker-compose -f docker-compose-simple.yml logs -f
 
-# Single service
-docker compose logs -f n8n
-docker compose logs -f ollama
-docker compose logs -f supabase-db
+# Einzelner Dienst
+docker-compose -f docker-compose-simple.yml logs -f n8n
+docker-compose -f docker-compose-simple.yml logs -f ollama
+docker-compose -f docker-compose-simple.yml logs -f postgres-db
 ```
 
-### Performing Updates
+### Updates durchführen
 ```bash
-# Update images
-docker compose pull
+# Images aktualisieren
+docker-compose -f docker-compose-simple.yml pull
 
-# Restart with new images
-docker compose up -d --force-recreate
+# Mit neuen Images neustarten
+docker-compose -f docker-compose-simple.yml up -d --force-recreate
 ```
 
-## 🚨 Troubleshooting
+## 🚨 Fehlerbehebung
 
-### Common Issues
+### Häufige Probleme
 
-**Containers fail to start:**
+**Container starten nicht:**
 ```bash
-# Check logs
-docker compose logs
+# Logs überprüfen
+docker-compose -f docker-compose-simple.yml logs
 
-# Check volumes
+# Volumes überprüfen
 docker volume ls
 
-# Check ports
-netstat -tulpn | grep :5678  # Linux
+# Ports überprüfen
 netstat -ano | findstr :5678  # Windows
 ```
 
-**Database connection fails:**
+**Datenbankverbindung schlägt fehl:**
 ```bash
-# PostgreSQL container status
-docker exec -it n8n-postgres pg_isready -U n8n_user
+# PostgreSQL Container-Status
+docker exec -it postgres-db pg_isready -U postgres
 
-# Test network connectivity
-docker exec -it n8n ping n8n-db
+# Netzwerkverbindung testen
+docker exec -it n8n ping postgres-db
 ```
 
-**Resolving port conflicts:**
+**Portkonflikt lösen:**
 ```env
-# Adjust in .env file
+# In der .env-Datei anpassen
 N8N_PORT=5679
-SUPABASE_STUDIO_PORT=3002
-KONG_HTTP_PORT=8001
+POSTGRES_PORT=5433
+OPEN_WEBUI_PORT=3001
 ```
 
-**Supabase Edge Functions issues:**
+## 🔒 Produktion & Sicherheit
+
+### Produktions-Checkliste
+- [ ] Alle Standardpasswörter geändert
+- [ ] SSL/HTTPS mit Reverse Proxy (Nginx/Traefik)
+- [ ] Firewall konfiguriert
+- [ ] Backup-Strategie implementiert
+- [ ] Log-Überwachung eingerichtet
+- [ ] `.env` von Git ausgeschlossen
+
+### Empfohlene Sicherheitsmaßnahmen
 ```bash
-# Edge functions are temporarily disabled due to compatibility issues
-# To re-enable, uncomment the relevant section in docker-compose.yml
-# and ensure the correct directory structure exists
-```
-
-## 🔒 Production & Security
-
-### Production Checklist
-- [ ] All default passwords changed
-- [ ] SSL/HTTPS with reverse proxy (Nginx/Traefik)
-- [ ] Firewall configured
-- [ ] Backup strategy implemented
-- [ ] Log monitoring set up
-- [ ] `.env` excluded from Git
-
-### Recommended Security Measures
-```bash
-# Use Docker Secrets (instead of .env)
+# Docker Secrets verwenden (statt .env)
 echo "my_password" | docker secret create db_password -
 
-# Network isolation
-# Only expose necessary ports
+# Netzwerkisolierung
+# Nur notwendige Ports exponieren
 ```
 
-## 🏗️ Project Structure
+## 🏗️ Projektstruktur
 
 ```
 AI-Chat-Agent/
-├── docker-compose.yml          # Main configuration
-├── .env                        # Your local environment variables
-├── setup-automated.sh          # Automated setup script
-├── setup-automated.ps1         # Windows setup script
-├── shared-files/               # Shared files between containers
-├── supabase/                   # Supabase configuration
-│   └── docker/volumes/
-│       ├── api/                # Kong API Gateway config
-│       ├── db/                 # Database initialization scripts
-│       └── functions/          # Edge Functions
-├── README.md                   # This file
-└── .gitignore                  # Git ignore rules
+├── docker-compose-simple.yml   # Vereinfachte Hauptkonfiguration
+├── .env                        # Lokale Umgebungsvariablen
+├── setup-automated.ps1         # Windows Setup-Skript
+├── shared-files/               # Gemeinsame Dateien zwischen Containern
+├── init.sql                    # Datenbank-Initialisierungsskript
+├── README.md                   # Diese Datei
+└── .gitignore                  # Git Ignore-Regeln
 ```
 
-## 🔄 Updates & Maintenance
+## 🔄 Updates & Wartung
 
-### Update Git Repository
+### Git Repository aktualisieren
 ```bash
 git pull origin main
-docker compose pull
-docker compose up -d --force-recreate
+docker-compose -f docker-compose-simple.yml pull
+docker-compose -f docker-compose-simple.yml up -d --force-recreate
 ```
 
-### Create Backup
+### Backup erstellen
 ```bash
 # PostgreSQL Backup
 docker exec n8n-postgres pg_dump -U n8n_user n8n > backup_n8n.sql
-docker exec supabase-postgres pg_dump -U postgres postgres > backup_supabase.sql
+docker exec postgres-db pg_dump -U postgres postgres > backup_postgres.sql
 
-# Volume backup
-docker run --rm -v n8n_data:/data -v $(pwd):/backup alpine tar czf /backup/n8n_backup.tar.gz /data
+# Volume Backup
+docker run --rm -v n8n_data:/data -v ${PWD}:/backup alpine tar czf /backup/n8n_backup.tar.gz /data
 ```
 
-## 📦 Automated Installation
+## 📦 Automatische Installation
 
-The setup scripts provide:
+Das Setup-Skript bietet:
 
-1. **Complete Configuration**: Creates all necessary files and directories
-2. **Database Initialization**: Sets up Supabase schemas and permissions
-3. **Security Hardening**: Applies security best practices
-4. **Cross-Platform**: Works on Linux, macOS, and Windows (via PowerShell)
+1. **Vollständige Konfiguration**: Erstellt alle notwendigen Dateien und Verzeichnisse
+2. **Datenbank-Initialisierung**: Richtet PostgreSQL-Schemas und -Tabellen ein
+3. **Sicherheitshärtung**: Wendet Sicherheitsmaßnahmen an
+4. **Plattformübergreifend**: Funktioniert auf Windows mit PowerShell
 
-## 🤝 Contribution & Support
+## 🔗 PostgreSQL-Verbindungsdetails
 
-### For Issues
-1. Create **Issues** in this repository
-2. Check **Logs** with `docker compose logs`
-3. Validate **Configuration** in `.env`
+### Verbindungsinformationen
 
-### Suggest Improvements
-- Pull Requests are welcome
-- Feature Requests via Issues
+| Parameter | Wert |
+|-----------|------|
+| Host      | localhost |
+| Port      | 5432 |
+| Datenbank | postgres |
+| Benutzer  | postgres |
+| Passwort  | supabase_local_dev_pass_2025 |
 
-## 📄 License & Credits
+### Verbindungs-String
 
-Based on the following Open Source projects:
+```
+postgresql://postgres:supabase_local_dev_pass_2025@localhost:5432/postgres
+```
 
-- **[n8n](https://github.com/n8n-io/n8n)** - Apache 2.0 License
-- **[Supabase](https://github.com/supabase/supabase)** - Apache 2.0 License  
-- **[Ollama](https://github.com/ollama/ollama)** - MIT License
-- **[PostgreSQL](https://www.postgresql.org/)** - PostgreSQL License
+### Eingerichtete Schemata
+
+- `auth` - Für Authentifizierung und Benutzerkonten
+- `storage` - Für Dateiablage
+- `realtime` - Für Echtzeit-Updates
+
+### Wichtige Tabellen
+
+- `auth.users` - Benutzerkonten
+- `storage.buckets` - Speicher-Bucket-Definitionen
+- `storage.objects` - Gespeicherte Dateien
+
+## 📄 Lizenz & Credits
+
+Basierend auf den folgenden Open-Source-Projekten:
+
+- **[n8n](https://github.com/n8n-io/n8n)** - Apache 2.0 Lizenz
+- **[PostgreSQL](https://www.postgresql.org/)** - PostgreSQL Lizenz
+- **[Ollama](https://github.com/ollama/ollama)** - MIT Lizenz
 
 ---
 
-## 🎉 Enjoy your local AI stack!
+## 🎉 Viel Spaß mit Ihrem lokalen KI-Stack!
 
-**Questions or feedback? Please create an issue! 🚀**
+**Fragen oder Feedback? Bitte erstellen Sie ein Issue! 🚀**
 
 ---
 
-*Developed with ❤️ for the Open Source AI Community*
+*Entwickelt mit ❤️ für die Open-Source-KI-Community*
