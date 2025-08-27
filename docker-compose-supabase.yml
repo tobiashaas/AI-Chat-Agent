@@ -1,12 +1,10 @@
-version: '3.8'
-
 services:
   supabase-db:
     image: supabase/postgres:15.1.0.147
     container_name: supabase-postgres
     restart: unless-stopped
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${SUPABASE_POSTGRES_PORT:-5433}:5432"
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-supabase_local_dev_pass_2025}
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
@@ -240,4 +238,5 @@ volumes:
 
 networks:
   ai_network:
+    name: ai-chat-agent_ai_network
     external: true

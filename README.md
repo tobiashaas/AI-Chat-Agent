@@ -45,14 +45,24 @@ notepad .env  # Adjust passwords and keys!
 
 ### 4. Start Services
 
-**Option A: Standard Start (without hardware acceleration)**
+**Option A: Interactive Startup (Recommended)**
 
 ```bash
-# Use docker compose (with space) for Docker Compose V2
-docker compose up -d
+# On Windows (PowerShell)
+.\start-interactive.ps1
+
+# On Linux/macOS
+chmod +x ./start-interactive.sh
+./start-interactive.sh
 ```
 
-**Option B: With automatic hardware acceleration (recommended)**
+The interactive startup script will:
+- Detect your hardware automatically
+- Let you choose which components to start
+- Configure memory limits based on your system
+- Start everything with optimal settings
+
+**Option B: With automatic hardware acceleration**
 
 ```bash
 # On Windows (PowerShell)
@@ -63,7 +73,14 @@ chmod +x ./start-with-acceleration.sh
 ./start-with-acceleration.sh
 ```
 
-This method automatically detects your GPU or NPU and uses the optimal configuration for your system.
+**Option C: Standard Start (without hardware acceleration)**
+
+```bash
+# Use docker compose (with space) for Docker Compose V2
+docker compose up -d
+```
+
+These methods automatically detect your GPU or NPU and use the optimal configuration for your system.
 
 > **Note:** If you see older guides or tutorials using `docker-compose` (with hyphen), replace this command with `docker compose` (with space), as this is the newer version of Docker Compose (V2).
 
@@ -90,6 +107,14 @@ This stack supports various hardware acceleration technologies for improved AI p
 - **Apple Silicon**: Optimized for M1/M2/M3 chips with Metal Performance Shaders
 - **Intel NPUs**: Experimental support for Intel Neural Processing Units
 - **Intel/AMD CPUs**: Utilizes AVX2/AVX512 instructions when available
+
+### Interactive Configuration
+
+The new interactive scripts (`start-interactive.sh` and `start-interactive.ps1`) provide a user-friendly interface for:
+- Selecting which components to start (Core services, Supabase, or all)
+- Choosing hardware acceleration options with smart defaults
+- Setting memory limits optimized for your system
+- Installing AI models after startup
 
 ### Automatic Detection and Configuration
 
@@ -451,6 +476,8 @@ AI-Chat-Agent/
 ├── .env                        # Local environment variables
 ├── setup-automated.ps1         # Windows setup script
 ├── setup-automated.sh          # Linux/macOS setup script
+├── start-interactive.ps1       # Interactive startup script (Windows)
+├── start-interactive.sh        # Interactive startup script (Linux/macOS)
 ├── start-supabase-ui.ps1       # Windows Supabase UI starter
 ├── start-supabase-ui.sh        # Linux/macOS Supabase UI starter
 ├── start-with-hardware-acceleration.ps1 # Windows start with hardware detection

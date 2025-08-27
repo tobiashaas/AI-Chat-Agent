@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres-db:
     extends:
@@ -15,6 +13,9 @@ services:
     extends:
       file: docker-compose.yml
       service: memory-db
+    # Add missing security_opt to base configuration
+    security_opt:
+      - no-new-privileges:true
 
   n8n:
     extends:
@@ -39,6 +40,9 @@ services:
     environment:
       - DYLD_LIBRARY_PATH=/usr/lib:/usr/local/lib
       - METAL_DEVICE_WRAPPER_TYPE=1
+    # Security enhancements - Explicitly defined to avoid duplication
+    security_opt:
+      - no-new-privileges:true
 
   open-webui:
     extends:
