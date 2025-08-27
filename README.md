@@ -119,9 +119,9 @@ All services run in the `ai_network` Docker network:
 
 | From n8n to | Connection string |
 |------------|-------------------|
-| PostgreSQL | `postgresql://n8n_user:password@n8n-db:5432/n8n` |
-| Memory DB | `postgresql://memory_user:password@memory-db:5432/n8n_memory` |
-| Data DB | `postgresql://postgres:password@postgres-db:5432/postgres` |
+| PostgreSQL | `postgresql://n8n_user:n8n_secure_local_pass_2025@n8n-db:5432/n8n` |
+| Memory DB | `postgresql://memory_user:memory_secure_local_pass_2025@memory-db:5432/n8n_memory` |
+| Data DB | `postgresql://postgres:supabase_local_dev_pass_2025@postgres-db:5432/postgres` |
 | Ollama | `http://ollama:11434` |
 
 ## 🤖 Installing Ollama Models
