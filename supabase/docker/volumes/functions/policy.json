@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "policy_declarations": [
+    {
+      "effect": "allow",
+      "action": "*",
+      "resource": "*"
+    }
+  ]
+}

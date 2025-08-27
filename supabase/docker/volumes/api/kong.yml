@@ -1,0 +1,126 @@
+_format_version: "1.1"
+
+consumers:
+  - username: anon
+    keyauth_credentials:
+      - key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNjQ1NzA2NDAwLCJleHAiOjE5NjEyODI0MDB9.M9jrxyvPLkUxWgOYSf5dNdJ8v_eR2YgOOkOFvU14GYs
+  - username: service_role
+    keyauth_credentials:
+      - key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJvbGUiOiJzZXJ2aWNlX3JvbGUiLCJpYXQiOjE2NDU3MDY0MDAsImV4cCI6MTk2MTI4MjQwMH0.tZpqOhbbkdOCpgTjQ9BqYyNV_gz7bbVJ_9tU1kLgWho
+
+acls:
+  - consumer: anon
+    group: anon
+  - consumer: service_role
+    group: admin
+
+services:
+  - name: auth
+    url: http://supabase-auth:9999
+    routes:
+      - name: auth
+        strip_path: true
+        paths:
+          - /auth/v1
+    plugins:
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - POST
+            - OPTIONS
+          headers:
+            - authorization
+            - content-type
+
+  - name: rest
+    url: http://supabase-rest:3000
+    routes:
+      - name: rest
+        strip_path: true
+        paths:
+          - /rest/v1
+    plugins:
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+            - OPTIONS
+          headers:
+            - authorization
+            - content-type
+      - name: key-auth
+        config:
+          hide_credentials: true
+
+  - name: realtime
+    url: http://supabase-realtime:4000/socket
+    routes:
+      - name: realtime
+        strip_path: true
+        paths:
+          - /realtime/v1
+    plugins:
+      - name: cors
+        config:
+          origins:
+            - "*"
+      - name: key-auth
+
+  - name: storage
+    url: http://supabase-storage:5000
+    routes:
+      - name: storage
+        strip_path: true
+        paths:
+          - /storage/v1
+    plugins:
+      - name: cors
+        config:
+          origins:
+            - "*"
+      - name: key-auth
+
+  - name: meta
+    url: http://supabase-meta:8080
+    routes:
+      - name: meta
+        strip_path: true
+        paths:
+          - /pg
+    plugins:
+      - name: key-auth
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+
+  - name: functions
+    url: http://supabase-edge-functions:9000
+    routes:
+      - name: functions
+        strip_path: true
+        paths:
+          - /functions/v1
+    plugins:
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+            - OPTIONS
+          headers:
+            - Authorization
+            - Content-Type
