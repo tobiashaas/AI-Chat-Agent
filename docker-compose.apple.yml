@@ -1,0 +1,62 @@
+services:
+  postgres-db:
+    extends:
+      file: docker-compose.yml
+      service: postgres-db
+
+  n8n-db:
+    extends:
+      file: docker-compose.yml
+      service: n8n-db
+
+  memory-db:
+    extends:
+      file: docker-compose.yml
+      service: memory-db
+    # Add missing security_opt to base configuration
+    security_opt:
+      - no-new-privileges:true
+
+  n8n:
+    extends:
+      file: docker-compose.yml
+      service: n8n
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - ai_network
+    # Apple Silicon Configuration
+    deploy:
+      resources:
+        limits:
+          memory: ${OLLAMA_MEMORY_LIMIT:-8G}
+    environment:
+      - DYLD_LIBRARY_PATH=/usr/lib:/usr/local/lib
+      - METAL_DEVICE_WRAPPER_TYPE=1
+    # Security enhancements - Explicitly defined to avoid duplication
+    security_opt:
+      - no-new-privileges:true
+
+  open-webui:
+    extends:
+      file: docker-compose.yml
+      service: open-webui
+
+networks:
+  ai_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  n8n_postgres_data:
+  memory_postgres_data:
+  n8n_data:
+  ollama_data:
+  open_webui_data:

@@ -1,0 +1,29 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - ai_network
+    # Apple Silicon Configuration
+    deploy:
+      resources:
+        limits:
+          memory: ${OLLAMA_MEMORY_LIMIT:-8G}
+    environment:
+      - DYLD_LIBRARY_PATH=/usr/lib:/usr/local/lib
+      - METAL_DEVICE_WRAPPER_TYPE=1
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  ai_network:
+    external: true
+
+volumes:
+  ollama_data:
+    external: true

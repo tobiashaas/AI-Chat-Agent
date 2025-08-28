@@ -1,0 +1,20 @@
+# Environment variables - contains sensitive information
+.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Docker volumes (optional, if you want to exclude)
+# volumes/
+
+# Editor specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+Thumbs.db
